@@ -62,7 +62,13 @@ export default function App() {
               
               <footer className="fixed bottom-0 left-0 right-0 h-12 border-t border-current/10 bg-current/80 backdrop-blur-md flex items-center px-6 z-50 overflow-hidden opacity-80">
                 <div className="flex items-center gap-4 text-[10px] sm:text-xs font-mono tracking-wider overflow-hidden">
-                <div className="flex items-center gap-2 text-neon-cyan">
+                  <img 
+                    src="/logo.png" 
+                    alt="" 
+                    className="w-5 h-5 rounded-md object-cover mr-2"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
+                  <div className="flex items-center gap-2 text-neon-cyan">
                    <div className="w-1.5 h-1.5 rounded-full bg-neon-cyan animate-pulse shadow-[0_0_8px_#00f2ff]" />
                    LIVE SYNC ACTIVE
                 </div>

@@ -113,12 +113,21 @@ export default function Home() {
     <div className="max-w-6xl mx-auto px-6 pt-24 pb-32">
       <SettingsBar />
       <header className="mb-20 flex flex-col md:flex-row md:items-end md:justify-between gap-12">
-        <div>
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-7xl sm:text-9xl font-display font-black tracking-tighter mb-4"
-          >
+        <div className="flex flex-col gap-8">
+          <motion.img 
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            src="/logo.png" 
+            alt="Logo" 
+            className="w-16 h-16 rounded-2xl object-cover shadow-2xl"
+            onError={(e) => (e.currentTarget.style.display = 'none')}
+          />
+          <div>
+            <motion.h1 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-7xl sm:text-9xl font-display font-black tracking-tighter mb-4"
+            >
             {t('home.title1')} <br />
             <span className="text-neon-cyan italic">{t('home.title2')}</span>
           </motion.h1>
@@ -131,6 +140,7 @@ export default function Home() {
             {t('home.subtitle')}
           </motion.p>
         </div>
+      </div>
 
         <form onSubmit={handleJoin} className="relative group max-w-sm w-full">
            <label className="text-[10px] font-mono uppercase tracking-[0.3em] text-current opacity-30 mb-3 block">{t('home.joinLabel')}</label>

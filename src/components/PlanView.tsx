@@ -102,11 +102,19 @@ export default function PlanView({ accessCode }: Props) {
       {/* Sidebar - Who's In */}
       <aside className="w-80 border-r border-current/10 bg-current/5 overflow-y-auto hidden lg:flex flex-col">
         <div className="p-8 border-b border-current/10">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-4xl font-display font-black">{t('plan.whosIn')}</h2>
-            <button onClick={() => navigate('/')} className="p-2 hover:bg-current/10 rounded-lg text-current opacity-40 hover:text-neon-cyan transition-all">
-              <Home size={20} />
-            </button>
+          <div className="flex items-center gap-4 mb-6">
+            <img 
+              src="/logo.png" 
+              alt="Logo" 
+              className="w-10 h-10 rounded-xl object-cover shadow-lg"
+              onError={(e) => (e.currentTarget.style.display = 'none')}
+            />
+            <div className="flex items-center justify-between flex-1">
+              <h2 className="text-4xl font-display font-black">{t('plan.whosIn')}</h2>
+              <button onClick={() => navigate('/')} className="p-2 hover:bg-current/10 rounded-lg text-current opacity-40 hover:text-neon-cyan transition-all">
+                <Home size={20} />
+              </button>
+            </div>
           </div>
           <p className="text-[10px] font-mono text-current opacity-40 uppercase tracking-widest px-1">
             {participants.length} {t('plan.active')}

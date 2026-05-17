@@ -81,6 +81,7 @@ const translations: Record<Language, Record<string, string>> = {
     'plan.schedule': 'Schedule',
     'plan.availabilityFor': 'Availability for',
     'plan.gotIt': 'Got it',
+    'plan.copied': 'Copied!',
   },
   pt: {
     'home.title1': 'Agora ou',
@@ -147,6 +148,7 @@ const translations: Record<Language, Record<string, string>> = {
     'plan.schedule': 'Agenda',
     'plan.availabilityFor': 'Disponibilidade para',
     'plan.gotIt': 'Entendido',
+    'plan.copied': 'Copiado!',
   }
 };
 

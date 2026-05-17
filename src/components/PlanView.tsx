@@ -21,6 +21,7 @@ export default function PlanView({ accessCode }: Props) {
   const { t, locale } = useSettings();
   const { plan, participants, loading, error, joinPlan, toggleAvailability } = usePlanRoom(accessCode);
   const [selectedSlot, setSelectedSlot] = React.useState<string | null>(null);
+  const [copied, setCopied] = React.useState(false);
   const myPart = participants.find(p => p.id === auth.currentUser?.uid);
   
   const heatmap = useMemo(() => {
@@ -82,7 +83,8 @@ export default function PlanView({ accessCode }: Props) {
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
-    // Simple toast could be added here
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const rejoinAsLocal = (id: string) => {
@@ -181,9 +183,19 @@ export default function PlanView({ accessCode }: Props) {
               </div>
               <button 
                 onClick={copyLink}
-                className="p-3 bg-neon-cyan text-black rounded-xl hover:scale-105 active:scale-95 transition-all shadow-[0_4px_20px_rgba(0,242,255,0.2)]"
+                className={cn(
+                  "flex items-center gap-2 px-4 py-3 rounded-xl transition-all shadow-[0_4px_20px_rgba(0,242,255,0.2)]",
+                  copied ? "bg-neon-green text-black scale-105" : "bg-neon-cyan text-black hover:scale-105 active:scale-95"
+                )}
               >
-                <Share2 size={20} />
+                {copied ? (
+                  <>
+                    <Zap size={20} className="fill-current" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">{t('plan.copied')}</span>
+                  </>
+                ) : (
+                  <Share2 size={20} />
+                )}
               </button>
             </div>
           </header>

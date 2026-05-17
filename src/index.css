@@ -1,0 +1,51 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,900;1,900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-neon-cyan: #00f2ff;
+  --color-neon-green: #39ff14;
+  --color-neon-purple: #bc13fe;
+  --color-page: var(--bg-page);
+}
+
+@layer base {
+  :root {
+    --bg-page: #000000;
+    --text-primary: #ffffff;
+    --border-subtle: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+  }
+
+  :root.light {
+    --bg-page: #f8f9fa;
+    --text-primary: #121212;
+    --border-subtle: rgba(0, 0, 0, 0.08);
+    --glass-bg: rgba(0, 0, 0, 0.03);
+  }
+
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    @apply antialiased selection:bg-neon-cyan/30 transition-colors duration-300;
+  }
+}
+
+.heatmap-cell {
+  @apply aspect-square rounded-sm transition-all duration-200 border;
+  border-color: var(--border-subtle);
+}
+
+.heatmap-active {
+  @apply bg-neon-cyan shadow-[0_0_15px_rgba(0,242,255,0.4)];
+}
+
+.glass {
+  background-color: var(--glass-bg);
+  backdrop-blur: 1.25rem;
+  border: 1px solid var(--border-subtle);
+}
+

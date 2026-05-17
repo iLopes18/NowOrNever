@@ -1,0 +1,8 @@
+{
+  "name": "Now or Never",
+  "description": "High-speed, visual group scheduling with real-time heatmaps and ephemeral planning sessions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "entities": {
+    "Plan": {
+      "title": "Plan",
+      "description": "A group scheduling session",
+      "type": "object",
+      "properties": {
+        "accessCode": { "type": "string", "description": "6-digit unique code" },
+        "type": { "type": "string", "enum": ["day", "month"], "description": "Mode of selection" },
+        "creatorId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": "string", "format": "date-time" },
+        "config": {
+          "type": "object",
+          "properties": {
+            "months": { "type": "array", "items": { "type": "string" } },
+            "year": { "type": "integer" },
+            "dates": { "type": "array", "items": { "type": "string" } },
+            "timeStart": { "type": "string" },
+            "timeEnd": { "type": "string" }
+          }
+        }
+      },
+      "required": ["accessCode", "type", "creatorId", "createdAt", "expiresAt"]
+    },
+    "Participant": {
+      "title": "Participant",
+      "description": "A user in a planning session",
+      "type": "object",
+      "properties": {
+        "displayName": { "type": "string" },
+        "availability": { "type": "array", "items": { "type": "string" } },
+        "lastActive": { "type": "string", "format": "date-time" }
+      },
+      "required": ["displayName", "availability", "lastActive"]
+    }
+  },
+  "firestore": {
+    "/plans/{planId}": {
+      "schema": "Plan",
+      "description": "Root plan document"
+    },
+    "/plans/{planId}/participants/{participantId}": {
+      "schema": "Participant",
+      "description": "Participants in a specific plan"
+    }
+  }
+}

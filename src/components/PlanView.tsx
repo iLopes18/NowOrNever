@@ -383,12 +383,11 @@ function MonthPlanner({ months, heatmap, myAvailability, participantsCount, onTo
                 </span>
               </button>
               {count > 0 && (
-                <button 
-                  onClick={() => onShowParticipants(dateStr)}
-                  className={cn("absolute top-2 right-2 text-[8px] font-black z-10 px-1 rounded hover:bg-current/10 transition-colors", isWinner ? "text-black" : "text-neon-purple")}
+                <div 
+                  className={cn("absolute top-2 right-2 text-[8px] font-black z-10 px-1", isWinner ? "text-black" : "text-neon-purple")}
                 >
                   {count}
-                </button>
+                </div>
               )}
             </div>
           );
@@ -487,25 +486,23 @@ function DayPlanner({ dates, timeStart, timeEnd, heatmap, myAvailability, partic
                 <div className="relative flex-1 flex items-center justify-between z-10 pointer-events-none">
                    <div className="flex -space-x-2 pointer-events-auto">
                        {Array.from({ length: Math.min(count, 5) }).map((_, i) => (
-                         <button 
+                         <div 
                            key={i} 
-                           onClick={() => onShowParticipants(slotKey)}
                            className={cn(
-                             "w-6 h-6 rounded-full border-2 border-inherit flex items-center justify-center text-[8px] font-bold shadow-sm hover:scale-110 transition-transform",
+                             "w-6 h-6 rounded-full border-2 border-inherit flex items-center justify-center text-[8px] font-bold shadow-sm",
                              isWinner ? "bg-black text-white" : "bg-current/20 text-current"
                            )}
                          >
                            {i === 4 && count > 5 ? `+${count-4}` : ''}
-                         </button>
+                         </div>
                        ))}
                    </div>
                    {isWinner && <div className="text-[10px] font-black uppercase tracking-widest bg-black text-white px-2 py-0.5 rounded">{t('plan.winner')}</div>}
-                   <button 
-                     onClick={() => onShowParticipants(slotKey)}
-                     className={cn("font-black tracking-tight pointer-events-auto hover:underline", isWinner ? "text-black" : "text-current opacity-80")}
+                   <div 
+                     className={cn("font-black tracking-tight pointer-events-auto", isWinner ? "text-black" : "text-current opacity-80")}
                    >
                       {count}/{participantsCount} <span className="text-[10px] opacity-40 uppercase">{t('plan.available')}</span>
-                   </button>
+                   </div>
                 </div>
               </div>
             </div>

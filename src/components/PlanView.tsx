@@ -20,6 +20,7 @@ export default function PlanView({ accessCode }: Props) {
   const { setStats } = useStats();
   const { t, locale } = useSettings();
   const { plan, participants, loading, error, joinPlan, toggleAvailability } = usePlanRoom(accessCode);
+  const [selectedSlot, setSelectedSlot] = React.useState<string | null>(null);
   const myPart = participants.find(p => p.id === auth.currentUser?.uid);
   
   const heatmap = useMemo(() => {
@@ -196,6 +197,7 @@ export default function PlanView({ accessCode }: Props) {
                    myAvailability={myPart?.availability || []}
                    participantsCount={participants.length}
                    onToggle={toggleAvailability}
+                   onShowParticipants={setSelectedSlot}
                 />
              ) : (
                 <DayPlanner 
@@ -206,6 +208,7 @@ export default function PlanView({ accessCode }: Props) {
                    myAvailability={myPart?.availability || []}
                    participantsCount={participants.length}
                    onToggle={toggleAvailability}
+                   onShowParticipants={setSelectedSlot}
                 />
              )}
           </div>
@@ -215,7 +218,11 @@ export default function PlanView({ accessCode }: Props) {
             <h3 className="text-[10px] font-mono uppercase tracking-[0.3em] text-current opacity-30 mb-6">{t('plan.consensus')}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {topOptions.length > 0 ? topOptions.map((opt, i) => (
-                <div key={opt.slot} className="p-4 rounded-2xl bg-inherit border border-current/10 flex flex-col justify-between">
+                <button 
+                  key={opt.slot} 
+                  onClick={() => setSelectedSlot(opt.slot)}
+                  className="p-4 rounded-2xl bg-inherit border border-current/10 flex flex-col justify-between text-left hover:border-neon-cyan/50 hover:bg-neon-cyan/5 transition-all group"
+                >
                   <div>
                     <div className="text-[10px] font-bold text-current opacity-40 uppercase mb-2">#{i+1} {t('plan.optionLabel')}</div>
                     <div className="text-xl font-bold font-mono text-neon-cyan mb-1">{opt.slot}</div>
@@ -224,7 +231,7 @@ export default function PlanView({ accessCode }: Props) {
                     <span className="text-sm font-semibold">{opt.count} {t('plan.available')}</span>
                     <span className="text-sm font-black text-neon-green">{opt.percent}% {t('plan.match')}</span>
                   </div>
-                </div>
+                </button>
               )) : (
                 <div className="col-span-3 py-12 text-center text-current opacity-20 italic">
                   {t('plan.tapToSee')}
@@ -234,6 +241,58 @@ export default function PlanView({ accessCode }: Props) {
           </section>
         </div>
       </main>
+
+      <AnimatePresence>
+        {selectedSlot && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 bg-page/95 backdrop-blur-md">
+             <motion.div 
+               initial={{ scale: 0.9, opacity: 0 }}
+               animate={{ scale: 1, opacity: 1 }}
+               exit={{ scale: 0.9, opacity: 0 }}
+               className="max-w-md w-full bg-current/5 border border-current/10 rounded-3xl p-8 glass shadow-2xl relative"
+             >
+                <button 
+                  onClick={() => setSelectedSlot(null)}
+                  className="absolute top-6 right-6 p-2 hover:bg-current/10 rounded-full transition-colors"
+                >
+                  <Zap size={20} className="rotate-45" />
+                </button>
+
+                <div className="mb-8">
+                  <div className="text-[10px] font-black uppercase tracking-widest text-neon-cyan mb-2">{t('plan.availabilityFor')}</div>
+                  <h3 className="text-3xl font-display font-black">
+                    {selectedSlot.includes('_') 
+                      ? (() => {
+                          const [d, t] = selectedSlot.split('_');
+                          return `${format(new Date(d), 'EEE, d MMM', { locale })} @ ${t}`;
+                        })()
+                      : format(new Date(selectedSlot), selectedSlot.length <= 7 ? 'MMMM yyyy' : 'EEEE, d MMMM', { locale })
+                    }
+                  </h3>
+                </div>
+
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                   {participants.filter(p => p.availability.includes(selectedSlot)).map(p => (
+                     <div key={p.id} className="flex items-center gap-4 p-4 rounded-2xl bg-current/5 border border-current/5">
+                        <div className="w-10 h-10 rounded-full bg-neon-cyan/20 border border-neon-cyan/20 flex items-center justify-center font-bold text-neon-cyan text-xs">
+                          {p.displayName.slice(0, 2).toUpperCase()}
+                        </div>
+                        <span className="font-bold">{p.displayName}</span>
+                        <div className="ml-auto w-2 h-2 rounded-full bg-neon-green shadow-[0_0_10px_#39ff14]" />
+                     </div>
+                   ))}
+                </div>
+
+                <button 
+                  onClick={() => setSelectedSlot(null)}
+                  className="w-full mt-8 py-4 bg-neon-cyan text-black font-black uppercase tracking-widest rounded-xl hover:scale-[1.02] active:scale-95 transition-all"
+                >
+                  {t('plan.gotIt')}
+                </button>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {!localStorage.getItem(`plan_uid_${accessCode}`) && (
@@ -248,7 +307,7 @@ export default function PlanView({ accessCode }: Props) {
   );
 }
 
-function MonthPlanner({ months, heatmap, myAvailability, participantsCount, onToggle }: any) {
+function MonthPlanner({ months, heatmap, myAvailability, participantsCount, onToggle, onShowParticipants }: any) {
   const { t, locale } = useSettings();
   const [activeMonthStr, setActiveMonthStr] = React.useState(months[0]);
   
@@ -304,30 +363,34 @@ function MonthPlanner({ months, heatmap, myAvailability, participantsCount, onTo
           const isWinner = intensity === 1 && participantsCount > 1;
 
           return (
-            <button
-              key={dateStr}
-              onClick={() => onToggle(dateStr)}
-              className={cn(
-                "group relative aspect-square rounded-xl p-2 text-left transition-all overflow-hidden",
-                isSelected ? "border-2 border-neon-purple/50" : "border border-current/5",
-                isWinner ? "bg-neon-green shadow-[0_0_20px_rgba(57,255,20,0.4)] text-black" : "bg-current/5 hover:bg-current/10"
-              )}
-            >
-              {!isWinner && count > 0 && (
-                <div 
-                  className="absolute inset-x-0 bottom-0 bg-neon-purple/30 transition-all duration-500" 
-                  style={{ height: `${intensity * 100}%` }} 
-                />
-              )}
-              <span className={cn("relative z-10 text-sm font-bold", isWinner ? "text-black" : (isSelected ? "text-neon-purple" : "text-current opacity-80"))}>
-                {format(day, 'd')}
-              </span>
+            <div key={dateStr} className="relative aspect-square">
+              <button
+                onClick={() => onToggle(dateStr)}
+                className={cn(
+                  "w-full h-full group relative rounded-xl p-2 text-left transition-all overflow-hidden",
+                  isSelected ? "border-2 border-neon-purple/50" : "border border-current/5",
+                  isWinner ? "bg-neon-green shadow-[0_0_20px_rgba(57,255,20,0.4)] text-black" : "bg-current/5 hover:bg-current/10"
+                )}
+              >
+                {!isWinner && count > 0 && (
+                  <div 
+                    className="absolute inset-x-0 bottom-0 bg-neon-purple/30 transition-all duration-500" 
+                    style={{ height: `${intensity * 100}%` }} 
+                  />
+                )}
+                <span className={cn("relative z-10 text-sm font-bold", isWinner ? "text-black" : (isSelected ? "text-neon-purple" : "text-current opacity-80"))}>
+                  {format(day, 'd')}
+                </span>
+              </button>
               {count > 0 && (
-                <div className={cn("absolute top-2 right-2 text-[8px] font-black z-10", isWinner ? "text-black" : "text-neon-purple")}>
+                <button 
+                  onClick={() => onShowParticipants(dateStr)}
+                  className={cn("absolute top-2 right-2 text-[8px] font-black z-10 px-1 rounded hover:bg-current/10 transition-colors", isWinner ? "text-black" : "text-neon-purple")}
+                >
                   {count}
-                </div>
+                </button>
               )}
-            </button>
+            </div>
           );
         })}
       </div>
@@ -335,7 +398,7 @@ function MonthPlanner({ months, heatmap, myAvailability, participantsCount, onTo
   );
 }
 
-function DayPlanner({ dates, timeStart, timeEnd, heatmap, myAvailability, participantsCount, onToggle }: any) {
+function DayPlanner({ dates, timeStart, timeEnd, heatmap, myAvailability, participantsCount, onToggle, onShowParticipants }: any) {
   const { t, locale } = useSettings();
   const [activeDate, setActiveDate] = React.useState(dates[0]);
   
@@ -400,18 +463,14 @@ function DayPlanner({ dates, timeStart, timeEnd, heatmap, myAvailability, partic
           const isWinner = intensity === 1 && participantsCount > 1;
 
           return (
-            <button
-              key={slot}
-              onClick={() => onToggle(slotKey)}
-              className="w-full flex items-center gap-6 group text-left"
-            >
+            <div key={slot} className="w-full flex items-center gap-6 group">
               <div className="w-12 text-sm font-mono text-current opacity-40 group-hover:text-current group-hover:opacity-80 transition-colors">
                 {slot}
               </div>
               <div className={cn(
                 "flex-1 h-14 rounded-2xl relative overflow-hidden flex items-center px-6 transition-all",
                 isSelected ? "border-2 border-neon-cyan/50 shadow-[inset_0_0_15px_rgba(0,242,255,0.1)]" : "border border-current/5",
-                isWinner ? "bg-neon-green text-black" : "bg-inherit/5 group-hover:bg-inherit/10"
+                isWinner ? "bg-neon-green text-black" : "bg-inherit/5"
               )}>
                 {!isWinner && (
                   <div 
@@ -420,24 +479,36 @@ function DayPlanner({ dates, timeStart, timeEnd, heatmap, myAvailability, partic
                   />
                 )}
                 
-                <div className="relative flex-1 flex items-center justify-between">
-                   <div className="flex -space-x-2">
+                <button 
+                  onClick={() => onToggle(slotKey)}
+                  className="absolute inset-0 z-0 h-full w-full"
+                />
+
+                <div className="relative flex-1 flex items-center justify-between z-10 pointer-events-none">
+                   <div className="flex -space-x-2 pointer-events-auto">
                        {Array.from({ length: Math.min(count, 5) }).map((_, i) => (
-                         <div key={i} className={cn(
-                           "w-6 h-6 rounded-full border-2 border-inherit flex items-center justify-center text-[8px] font-bold shadow-sm",
-                           isWinner ? "bg-black text-white" : "bg-current/20 text-current"
-                         )}>
+                         <button 
+                           key={i} 
+                           onClick={() => onShowParticipants(slotKey)}
+                           className={cn(
+                             "w-6 h-6 rounded-full border-2 border-inherit flex items-center justify-center text-[8px] font-bold shadow-sm hover:scale-110 transition-transform",
+                             isWinner ? "bg-black text-white" : "bg-current/20 text-current"
+                           )}
+                         >
                            {i === 4 && count > 5 ? `+${count-4}` : ''}
-                         </div>
+                         </button>
                        ))}
                    </div>
                    {isWinner && <div className="text-[10px] font-black uppercase tracking-widest bg-black text-white px-2 py-0.5 rounded">{t('plan.winner')}</div>}
-                   <div className={cn("font-black tracking-tight", isWinner ? "text-black" : "text-current opacity-80")}>
+                   <button 
+                     onClick={() => onShowParticipants(slotKey)}
+                     className={cn("font-black tracking-tight pointer-events-auto hover:underline", isWinner ? "text-black" : "text-current opacity-80")}
+                   >
                       {count}/{participantsCount} <span className="text-[10px] opacity-40 uppercase">{t('plan.available')}</span>
-                   </div>
+                   </button>
                 </div>
               </div>
-            </button>
+            </div>
           );
         })}
       </div>

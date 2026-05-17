@@ -59,34 +59,11 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/:code" element={<PlanRoute />} />
               </Routes>
-              
-              <footer className="fixed bottom-0 left-0 right-0 h-12 border-t border-current/10 bg-current/80 backdrop-blur-md flex items-center px-6 z-50 overflow-hidden opacity-80">
-                <div className="flex items-center gap-4 text-[10px] sm:text-xs font-mono tracking-wider overflow-hidden">
-                  <img 
-                    src="/logo.png" 
-                    alt="" 
-                    className="w-5 h-5 rounded-md object-cover mr-2"
-                    onError={(e) => (e.currentTarget.style.display = 'none')}
-                  />
-                  <div className="flex items-center gap-2 text-neon-cyan">
-                   <div className="w-1.5 h-1.5 rounded-full bg-neon-cyan animate-pulse shadow-[0_0_8px_#00f2ff]" />
-                   LIVE SYNC ACTIVE
-                </div>
-                <span className="text-current opacity-20">|</span>
-                <span className="text-current opacity-50 truncate">
-                  {stats}
-                </span>
-              </div>
-              <div className="ml-auto hidden sm:flex gap-6 text-[10px] uppercase font-black tracking-widest text-current opacity-20">
-                <span className="hover:text-current opacity-40 cursor-pointer">Privacy</span>
-                <span className="hover:text-current opacity-40 cursor-pointer">Terms</span>
-              </div>
-            </footer>
-          </div>
-        </StatsContext.Provider>
-      </AuthProvider>
-    </SettingsProvider>
-  </Router>
+            </div>
+          </StatsContext.Provider>
+        </AuthProvider>
+      </SettingsProvider>
+    </Router>
   );
 }
 
